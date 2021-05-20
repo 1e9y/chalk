@@ -6,6 +6,14 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/mattn/go-isatty"
+)
+
+var (
+	// IsTerminal defines whether the output is a terminal and supports colorized output.
+	// A more accurate way to determine this would be to check if `tput color` is greater than 8.
+	IsTerminal = os.Getenv("TERM") != "dumb" && isatty.IsTerminal(os.Stdout.Fd())
 )
 
 // TODO: Explore performance impact of using `uint8`
@@ -73,10 +81,26 @@ const (
 const BGGray = BGBrightBlack
 
 type Chalk struct {
-	params []Parameter
+	enabled *bool
+	params  []Parameter
 }
 
 const csi = "\x1b["
+
+func (c *Chalk) Enable() {
+	c.enabled = func() *bool { t := true; return &t }()
+}
+
+func (c *Chalk) Disable() {
+	c.enabled = func() *bool { f := false; return &f }()
+}
+
+func (c *Chalk) isEnabled() bool {
+	if c.enabled == nil {
+		return IsTerminal
+	}
+	return *c.enabled
+}
 
 func (c *Chalk) sequence() string {
 	seq := make([]string, len(c.params))
@@ -87,14 +111,23 @@ func (c *Chalk) sequence() string {
 }
 
 func (c *Chalk) set(w io.Writer) {
+	if !c.isEnabled() {
+		return
+	}
 	fmt.Fprint(w, csi+c.sequence()+"m")
 }
 
 func (c *Chalk) unset(w io.Writer) {
+	if !c.isEnabled() {
+		return
+	}
 	fmt.Fprint(w, csi+"0m")
 }
 
 func (c *Chalk) wrap(s string) string {
+	if !c.isEnabled() {
+		return s
+	}
 	return fmt.Sprintf("%s%s%s%s", csi, c.sequence(), s, csi+"0m")
 }
 
