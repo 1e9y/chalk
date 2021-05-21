@@ -107,14 +107,14 @@ func (c *Chalk) sequence() string {
 	for i, p := range c.params {
 		seq[i] = strconv.Itoa(int(p))
 	}
-	return strings.Join(seq, ";")
+	return strings.Join(seq, ";") + "m"
 }
 
 func (c *Chalk) set(w io.Writer) {
 	if !c.isEnabled() {
 		return
 	}
-	fmt.Fprint(w, csi+c.sequence()+"m")
+	fmt.Fprint(w, csi+c.sequence())
 }
 
 func (c *Chalk) unset(w io.Writer) {
