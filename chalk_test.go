@@ -117,3 +117,21 @@ func ExampleChalk_Printf() {
 	// [36mhello, cyan![0m
 	// [37mhello, white![0m
 }
+
+func ExampleRed() {
+	Red("red")
+	fmt.Println()
+	Red("hello, %s!", "red")
+	// Output:
+	// [31mred[0m
+	// [31mhello, red![0m
+}
+
+func ExampleGreen() {
+	Red("green")
+	fmt.Println()
+	Red("hello, %s!", "green")
+	// Output:
+	// [32mgreen[0m
+	// [32mhello, green![0m
+}
