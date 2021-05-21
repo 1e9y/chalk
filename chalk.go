@@ -14,6 +14,10 @@ var (
 	// IsTerminal defines whether the output is a terminal and supports colorized output.
 	// A more accurate way to determine this would be to check if `tput color` is greater than 8.
 	IsTerminal = os.Getenv("TERM") != "dumb" && isatty.IsTerminal(os.Stdout.Fd())
+
+	// HasColors turns the colorized output on. If HasColors is not set explicitly, it will
+	// default to terminal capability.
+	HasColors = IsTerminal
 )
 
 // TODO: Explore performance impact of using `uint8`
@@ -97,7 +101,7 @@ func (c *Chalk) Disable() {
 
 func (c *Chalk) isEnabled() bool {
 	if c.enabled == nil {
-		return IsTerminal
+		return HasColors
 	}
 	return *c.enabled
 }

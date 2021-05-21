@@ -5,6 +5,11 @@ import (
 	"testing"
 )
 
+func init() {
+	// Force tests to print escape sequence regardless of terminal capabilities.
+	HasColors = true
+}
+
 var codes = []struct {
 	p    Parameter
 	code int
@@ -34,7 +39,6 @@ func TestAddColors(t *testing.T) {
 	// TODO: Use inner loop to add variable number of colors to the chalk
 	for i := 2; i < len(codes); i += 3 {
 		chalk := NewChalk()
-		chalk.Enable()
 		chalk.Add(codes[i-2].p).Add(codes[i-1].p).Add(codes[i].p)
 		want := fmt.Sprintf("\x1b[32m%s\x1b[0m", codes[i].name)
 		if s := chalk.Sprint(codes[i].name); s != want {
@@ -46,7 +50,6 @@ func TestAddColors(t *testing.T) {
 func TestChalk_Sprint(t *testing.T) {
 	for _, test := range codes {
 		chalk := NewChalk()
-		chalk.Enable()
 		chalk.Add(test.p)
 		want := fmt.Sprintf("\x1b[%dm%s\x1b[0m", test.code, test.name)
 		if s := chalk.Sprint(test.name); s != want {
@@ -58,7 +61,6 @@ func TestChalk_Sprint(t *testing.T) {
 func TestChalk_Sprintf(t *testing.T) {
 	for _, test := range codes {
 		chalk := NewChalk()
-		chalk.Enable()
 		chalk.Add(test.p)
 		want := fmt.Sprintf("\x1b[%dmhello, %s!\x1b[0m", test.code, test.name)
 		if s := chalk.Sprintf("hello, %s!", test.name); s != want {
@@ -70,7 +72,6 @@ func TestChalk_Sprintf(t *testing.T) {
 func TestChalk_Sprintln(t *testing.T) {
 	for _, test := range codes {
 		chalk := NewChalk()
-		chalk.Enable()
 		chalk.Add(test.p)
 		want := fmt.Sprintf("\x1b[%dm%s\n\x1b[0m", test.code, test.name)
 		if s := chalk.Sprintln(test.name); s != want {
@@ -83,7 +84,6 @@ func ExampleChalk_Print() {
 	// TODO: Explore ways of capturing stdout
 	for _, test := range codes[:8] {
 		chalk := NewChalk()
-		chalk.Enable()
 		chalk.Add(test.p)
 		chalk.Println(test.name)
 	}
@@ -102,7 +102,6 @@ func ExampleChalk_Print() {
 func ExampleChalk_Printf() {
 	for _, test := range codes[:8] {
 		chalk := NewChalk()
-		chalk.Enable()
 		chalk.Add(test.p)
 		chalk.Printf("hello, %s!", test.name)
 		fmt.Println()
@@ -128,9 +127,9 @@ func ExampleRed() {
 }
 
 func ExampleGreen() {
-	Red("green")
+	Green("green")
 	fmt.Println()
-	Red("hello, %s!", "green")
+	Green("hello, %s!", "green")
 	// Output:
 	// [32mgreen[0m
 	// [32mhello, green![0m
