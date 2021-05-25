@@ -131,8 +131,16 @@ func ExampleRed() {
 func ExampleGreen() {
 	Green("green")
 	fmt.Println()
-	Green("hello, %s!", "green")
+	Green("hello, %	s!", "green")
 	// Output:
 	// [32mgreen[0m
 	// [32mhello, green![0m
+}
+
+func BenchmarkChalk_Print(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		c := NewChalk()
+		c.Add(FGRed)
+		_ = c.Sprint("hello")
+	}
 }

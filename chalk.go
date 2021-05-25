@@ -130,6 +130,30 @@ func (c *Chalk) sequence() string {
 	return strings.Join(seq, ";") + "m"
 }
 
+//func (c *Chalk) sequence() string {
+//	var out strings.Builder
+//	for i, p := range c.attributes {
+//		out.Write([]byte(strconv.Itoa(int(p))))
+//		if i != 0 {
+//			out.WriteRune(';')
+//		}
+//	}
+//	if c.fgColor > 0 {
+//		if out.Len() > 0 {
+//			out.WriteRune(';')
+//		}
+//		out.WriteString(strconv.Itoa(int(c.fgColor)))
+//	}
+//	if c.bgColor > 0 {
+//		if out.Len() > 0 {
+//			out.WriteRune(';')
+//		}
+//		out.WriteString(strconv.Itoa(int(c.bgColor)))
+//	}
+//	out.WriteRune('m')
+//	return out.String()
+//}
+
 func (c *Chalk) set(w io.Writer) {
 	if !c.isEnabled() {
 		return
@@ -148,7 +172,7 @@ func (c *Chalk) wrap(s string) string {
 	if !c.isEnabled() {
 		return s
 	}
-	return fmt.Sprintf("%s%s%s%s", csi, c.sequence(), s, csi+"0m")
+	return csi + c.sequence() + s + csi + "0m"
 }
 
 func NewChalk(p ...Parameter) *Chalk {
