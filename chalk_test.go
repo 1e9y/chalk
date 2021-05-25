@@ -131,7 +131,7 @@ func ExampleRed() {
 func ExampleGreen() {
 	Green("green")
 	fmt.Println()
-	Green("hello, %	s!", "green")
+	Green("hello, %s!", "green")
 	// Output:
 	// [32mgreen[0m
 	// [32mhello, green![0m
