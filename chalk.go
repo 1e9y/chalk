@@ -84,9 +84,19 @@ const (
 
 const BGGray = BGBrightBlack
 
+func (p Parameter) isFGColor() bool {
+	return (p >= 30 && p <= 37) || (p >= 90 && p <= 97)
+}
+
+func (p Parameter) isBGColor() bool {
+	return (p >= 40 && p <= 47) || (p >= 100 && p <= 107)
+}
+
 type Chalk struct {
-	enabled *bool
-	params  []Parameter
+	enabled    *bool
+	fgColor    Parameter
+	bgColor    Parameter
+	attributes []Parameter
 }
 
 const csi = "\x1b["
@@ -107,9 +117,15 @@ func (c *Chalk) isEnabled() bool {
 }
 
 func (c *Chalk) sequence() string {
-	seq := make([]string, len(c.params))
-	for i, p := range c.params {
+	seq := make([]string, len(c.attributes))
+	for i, p := range c.attributes {
 		seq[i] = strconv.Itoa(int(p))
+	}
+	if c.fgColor > 0 {
+		seq = append(seq, strconv.Itoa(int(c.fgColor)))
+	}
+	if c.bgColor > 0 {
+		seq = append(seq, strconv.Itoa(int(c.bgColor)))
 	}
 	return strings.Join(seq, ";") + "m"
 }
@@ -136,12 +152,18 @@ func (c *Chalk) wrap(s string) string {
 }
 
 func NewChalk(p ...Parameter) *Chalk {
-	c := Chalk{params: p}
+	c := Chalk{attributes: p}
 	return &c
 }
 
 func (c *Chalk) Add(color Parameter) *Chalk {
-	c.params = append(c.params, color)
+	if color.isFGColor() {
+		c.fgColor = color
+	} else if color.isBGColor() {
+		c.bgColor = color
+	} else {
+		c.attributes = append(c.attributes, color)
+	}
 	return c
 }
 

@@ -36,13 +36,15 @@ var codes = []struct {
 }
 
 func TestAddColors(t *testing.T) {
-	// TODO: Use inner loop to add variable number of colors to the chalk
-	for i := 2; i < len(codes); i += 3 {
+	for i := range codes {
 		chalk := NewChalk()
-		chalk.Add(codes[i-2].p).Add(codes[i-1].p).Add(codes[i].p)
-		want := fmt.Sprintf("\x1b[32m%s\x1b[0m", codes[i].name)
+		// Foreground colors on the same chalk should override each other.
+		for j := 0; j <= i; j++ {
+			chalk.Add(codes[j].p)
+		}
+		want := fmt.Sprintf("\x1b[%dm%s\x1b[0m", codes[i].code, codes[i].name)
 		if s := chalk.Sprint(codes[i].name); s != want {
-			t.Errorf("got:%q\nwant:%s", s, want)
+			t.Errorf("got:%q\nwant:%q", s, want)
 		}
 	}
 }
